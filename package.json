@@ -1,0 +1,15 @@
+{
+  "name": "squarbrezhnik",
+  "version": "1.0.0",
+  "description": "SquareBrezhnik.ru",
+  "main": "index.js",
+  "scripts": {
+    "test": "node ."
+  },
+  "author": "Nikifor Cheshinskiy",
+  "license": "UNLICENSED",
+  "dependencies": {
+    "express": "^4.18.1",
+    "socket.io": "^4.5.1"
+  }
+}
