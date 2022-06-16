@@ -3,6 +3,9 @@ var fs=require("fs")
 var express=require("express")
 var sio=require("socket.io")
 var assets={}
+
+
+
 function fetchAsset(assetName){
     if(!assets.hasOwnProperty(assetName)){
     try{
@@ -17,17 +20,31 @@ function fetchAsset(assetName){
     }
     return assets[assetName]
 }
-
+var allproducts=require("./products.js")
 var socktokens=new Map()
 var socketInvalidationInterval=setInterval(()=>{
     var dn=Date.now()
     socktokens.forEach((v,k)=>v<dn?socktokens.delete(k):1)
 },5000)
-function checkAuth(a,sock){
-    return socktokens.has(a)?sockethandler(new socketUser(sock,a)):sock.disconnect(true)
+function checkAuth(a,sock,inv){
+    socktokens.has(a)?clearTimeout(inv)||sockethandler(new socketUser(sock,a)):sock.disconnect(true)
 }
 function requestData(info){
-
+    try{
+        switch(info.what){
+            case"fetchHomePageProductsHTML":{
+                return allproducts.asShowOfHTML
+            }
+            case"fetchProductInfo":{
+                if(!info.hasOwnProperty('products'))return false
+                var returnv={}
+                for(var prd in info.products)
+                returnv[info.products[prd]] = allproducts.basic_info[info.products[prd]]
+                return returnv
+            }
+            default: return false
+        }
+    }catch{return false}
 }
 class socketUser{
     /**
@@ -41,9 +58,7 @@ class socketUser{
         sock.on("requestData",(d,id)=>sock.emit("responseData",requestData(d),id))
     }
 }
-function isSockAuthed(sock){
-    sock.disconnect(!(sock instanceof socketUser))
-}
+
 /**
  * 
  * @param {sio.Socket} sock 
@@ -53,8 +68,8 @@ if(sock instanceof socketUser){
     console.log(sock)
 }
 else{
-    setTimeout(isSockAuthed,3000,sock)
-    sock.on("auth",auth=>checkAuth(auth,sock))
+    var invalidator=setTimeout(sock.disconnect,3000,true)
+    sock.on("auth",auth=>checkAuth(auth,sock,invalidator))
 }
 
 }
@@ -63,6 +78,7 @@ var httpsv=express()
 httpsv.get("/*",(req,res)=>{
     // console.log()
     socktokens.set(req.headers.cookie,Date.now()+5*60*1000)
+    
     console.info(`${req.method} request at ${req.path} IP: ${req.socket.remoteAddress}`)
     if(req.path.includes(".."))return res.end("nah man thats not gonna work :)")
     return res.end(fetchAsset(req.path.substring(1)))
