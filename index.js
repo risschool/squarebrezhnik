@@ -17,16 +17,23 @@ function fetchAsset(assetName){
     }
     return assets[assetName]
 }
+var socktokens=new Map()
+function checkAuth(socktoken){
+    return socktokens.has(socktoken)
+}
 /**
  * 
  * @param {sio.Socket} sock 
  */
+
 function sockethandler(sock,auth){
 if(!auth){
 sock.emit("auth","auth_self")
-sock.on("auth",a=>sockethandler(sock,true))
+sock.on("auth",a=>checkAuth(a)?sockethandler(sock,true):sock.disconnect(true))
 }
-else{}
+else{
+
+}
 
 }
 var httpsv=express()
