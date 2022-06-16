@@ -17,28 +17,52 @@ function fetchAsset(assetName){
     }
     return assets[assetName]
 }
+
 var socktokens=new Map()
-function checkAuth(socktoken){
-    return socktokens.has(socktoken)
+var socketInvalidationInterval=setInterval(()=>{
+    var dn=Date.now()
+    socktokens.forEach((v,k)=>v<dn?socktokens.delete(k):1)
+},5000)
+function checkAuth(a,sock){
+    return socktokens.has(a)?sockethandler(new socketUser(sock,a)):sock.disconnect(true)
+}
+function requestData(info){
+
+}
+class socketUser{
+    /**
+     * 
+     * @param {sio.Socket} sock 
+     */
+    constructor(sock,cookie){
+        this.socket=sock
+        this.cookie=cookie
+        sock.on("path",p=>this.path=p)
+        sock.on("requestData",(d,id)=>sock.emit("responseData",requestData(d),id))
+    }
+}
+function isSockAuthed(sock){
+    sock.disconnect(!(sock instanceof socketUser))
 }
 /**
  * 
  * @param {sio.Socket} sock 
  */
-
-function sockethandler(sock,auth){
-if(!auth){
-sock.emit("auth","auth_self")
-sock.on("auth",a=>checkAuth(a)?sockethandler(sock,true):sock.disconnect(true))
+function sockethandler(sock){
+if(sock instanceof socketUser){
+    console.log(sock)
 }
 else{
-
+    setTimeout(isSockAuthed,3000,sock)
+    sock.on("auth",auth=>checkAuth(auth,sock))
 }
 
 }
 var httpsv=express()
 
 httpsv.get("/*",(req,res)=>{
+    // console.log()
+    socktokens.set(req.headers.cookie,Date.now()+5*60*1000)
     console.info(`${req.method} request at ${req.path} IP: ${req.socket.remoteAddress}`)
     if(req.path.includes(".."))return res.end("nah man thats not gonna work :)")
     return res.end(fetchAsset(req.path.substring(1)))
