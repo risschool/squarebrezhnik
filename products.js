@@ -47,6 +47,21 @@ var products={
     }
 
 }
+var workers=[
+    {
+        name:"Roman Sergeevich",
+        role:"Proffesional carpenter",
+        image:"assets/img/avaters/avatar1.png",
+        description:'Works with highest qualities of wood in order to create your luxurious bird houses'
+
+    },
+    {
+        name:"Guinn Neil",
+        role:"CEO",
+        image:"",
+        description:""
+    }
+]
 var asShowOfHTML={}
 var basic_info={}
 for(var product in products){
@@ -57,5 +72,6 @@ for(var product in products){
 module.exports={
     asShowOfHTML,
     products,
-    basic_info
+    basic_info,
+    workers
 }

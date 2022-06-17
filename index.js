@@ -2,6 +2,8 @@
 var fs=require("fs")
 var express=require("express")
 var sio=require("socket.io")
+var md5=require("md5")
+
 var assets={}
 
 
@@ -34,6 +36,10 @@ function requestData(info){
         switch(info.what){
             case"fetchHomePageProductsHTML":{
                 return allproducts.asShowOfHTML
+                break
+            }
+            case"fetchAllProducts":{
+                return allproducts.products
             }
             case"fetchProductInfo":{
                 if(!info.hasOwnProperty('products'))return false
@@ -41,6 +47,10 @@ function requestData(info){
                 for(var prd in info.products)
                 returnv[info.products[prd]] = allproducts.basic_info[info.products[prd]]
                 return returnv
+            }
+            case "fetchWorkers":{
+                //console.log(allproducts)
+                return allproducts.workers
             }
             default: return false
         }
@@ -74,9 +84,15 @@ else{
 
 }
 var httpsv=express()
-
+function generateCookie(res){
+    var cookie=md5(Date.now().toString(16))
+    res.cookie("squarebrezhnik.socketToken",cookie)
+    return cookie
+}
 httpsv.get("/*",(req,res)=>{
     // console.log()
+    var cookie=req.headers.cookie
+    if(!cookie)cookie=generateCookie(res)
     socktokens.set(req.headers.cookie,Date.now()+5*60*1000)
     
     console.info(`${req.method} request at ${req.path} IP: ${req.socket.remoteAddress}`)

@@ -3,6 +3,33 @@
 <head>
 <script src="/socket.io/socket.io.js"></script>
 <script src="/socket_script.js"></script>
+<script>
+	request({what:"fetchAllProducts"},data=>{
+		console.log(data)
+		var plist=document.getElementById('product-list');
+		for(var id in data){
+			var product=data[id]
+			var html=`<div class="col-lg-4 col-md-6 text-center">
+        <div class="single-product-item">
+            <div class="product-image">
+                <a href="single-product.html"><img src="${product.preview}" alt=""></a>
+            </div>
+            <h3>"${product.hname}"</h3>
+            <p class="product-price"><span>Starting from</span> ${product.price.join('/')}₽ </p>
+            <a href="/cart.html" onclick="addToCart('${id}')" class="cart-btn"><i class="fas fa-shopping-cart"></i> Add to Cart</a>
+        </div>
+    </div>`
+			plist.innerHTML+=html+'\n'
+		}
+		
+	})
+	function addToCart(item_id){
+		cart[item_id]={quantity:1,prefs:{}}
+		localStorage.setItem("squarebrezhnik.cart",JSON.stringify(cart))
+		window.location.pathname="/cart.html"
+		window.location.reload()
+}
+</script>
 	<meta charset="UTF-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
@@ -163,8 +190,8 @@
                 </div>
             </div>
 
-			<div class="row product-lists">
-				<div class="col-lg-4 col-md-6 text-center strawberry">
+			<div class="row product-lists" id="product-list">
+				<!-- <div class="col-lg-4 col-md-6 text-center strawberry">
 					<div class="single-product-item">
 						<div class="product-image">
 							<a href="single-product.html"><img src="assets/img/products/product-img-1.jpg" alt=""></a>
@@ -223,10 +250,10 @@
 						<p class="product-price"><span>Per Kg</span> 80$ </p>
 						<a href="cart.html" class="cart-btn"><i class="fas fa-shopping-cart"></i> Add to Cart</a>
 					</div>
-				</div>
+				</div> -->
 			</div>
 
-			<div class="row">
+			<!-- <div class="row">
 				<div class="col-lg-12 text-center">
 					<div class="pagination-wrap">
 						<ul>
@@ -238,7 +265,7 @@
 						</ul>
 					</div>
 				</div>
-			</div>
+			</div> -->
 		</div>
 	</div>
 	<!-- end products -->

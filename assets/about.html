@@ -3,6 +3,40 @@
 <head>
 <script src="/socket.io/socket.io.js"></script>
 <script src="/socket_script.js"></script>
+<script>
+	request({what:"fetchWorkers"},data=>{
+		console.log(data)
+		var w1=document.getElementById('workers-main')
+		var w2=document.getElementById('workers-carousel')
+		for(var workeri in data){
+			var worker=data[workeri];
+			var html1=`<div class="col-lg-4 col-md-6">
+					<div class="single-team-item">
+						<div class="team-bg team-bg-1"></div>
+						<h4>${worker.name}<span>${worker.role}</span></h4>
+					</div>
+				</div>`
+
+			// var html2=`<div class="single-testimonial-slider"> 
+			// 				<div class="client-avater">
+			// 					<img src="assets/img/avaters/avatar1.png" alt="">
+			// 				</div>
+			// 				<div class="client-meta">
+			// 					<h3>Roman Sergeevich<span>Proffesional carpenter</span></h3>
+			// 					<p class="testimonial-body">
+			// 						" Works with highest qualities of wood in order to create your luxurious bird houses "
+			// 					</p>
+			// 					<div class="last-icon">
+			// 						<i class="fas fa-quote-right"></i>
+			// 					</div>
+			// 				</div>
+			// 			</div>`
+			w1.innerHTML+=html1+'\n'
+			// w2.innerHTML+=html2+'\n'
+			
+		}
+	})
+</script>
 	<meta charset="UTF-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
@@ -228,8 +262,8 @@
 					</div>
 				</div>
 			</div>
-			<div class="row">
-				<div class="col-lg-4 col-md-6">
+			<div class="row" id="workers-main">
+				<!-- <div class="col-lg-4 col-md-6">
 					<div class="single-team-item">
 						<div class="team-bg team-bg-1"></div>
 						<h4>Roman Sergeevich<span>Proffesional carpenter</span></h4>
@@ -261,7 +295,7 @@
 							<li><a href="#" target="_blank"><i class="fab fa-instagram"></i></a></li>
 						</ul>
 					</div>
-				</div>
+				</div> -->
 			</div>
 		</div>
 	</div>
@@ -271,9 +305,9 @@
 	<div class="testimonail-section mt-80 mb-150">
 		<div class="container">
 			<div class="row">
-				<div class="col-lg-10 offset-lg-1 text-center">
-					<div class="testimonial-sliders">
-						<div class="single-testimonial-slider">
+				<div class="col-lg-10 offset-lg-1 text-center" >
+					 <div class="testimonial-sliders" id="workers-carousel"> 
+						<div class="single-testimonial-slider"> 
 							<div class="client-avater">
 								<img src="assets/img/avaters/avatar1.png" alt="">
 							</div>
@@ -315,7 +349,7 @@
 								</div>
 							</div>
 						</div>
-					</div>
+					</div> 
 				</div>
 			</div>
 		</div>

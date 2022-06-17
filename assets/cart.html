@@ -4,14 +4,6 @@
 <script src="/socket.io/socket.io.js"></script>
 <script src="/socket_script.js"></script>
 <script type="text/javascript" >
-	// function sri(arr,donotguess=[]){
-	// 	var out
-	// 	do
-	// 	out=arr[Math.floor(Math.random()*arr.length)]
-	// 	while(donotguess.includes(out))
-		
-	// 	return out
-	// }
 	var cart=JSON.parse(localStorage.getItem("squarebrezhnik.cart"))||{}
 	request({what:"fetchProductInfo",products:Object.keys(cart)},data=>{
 		var ccts=document.getElementById('cart-contents')
@@ -23,13 +15,26 @@
 									<td class="product-image"><img src="${item.image}" alt=""></td>
 									<td class="product-name">${item.hname}</td>
 									<td class="product-price">${item.price.join('/')}</td>
-									<td class="product-quantity">${cart[prd].quantity}<input type="number" placeholder="0"></td>
+									<td class="product-quantity"><input id="${prd}::quantityInput" onchange="setQuantity('${prd}',fetchValue('${prd}::quantityInput'))" value="${cart[prd].quantity}" type="number" placeholder="0"></td>
 									
 								</tr>`
 			ccts.innerHTML+=html+'\n'
 		}
 		
 	})
+	function fetchValue(id){
+		var e=document.getElementById(id);
+		var r=e.value-0===NaN||
+		e.value-0<1||
+		e.value-0!=Math.floor(e.value-0)
+		?e.value=1:e.value-0
+		return r
+		
+	}
+	function setQuantity(item, quantity){
+		cart[item].quantity=quantity
+		localStorage.setItem("squarebrezhnik.cart",JSON.stringify(cart))
+	}
 	function removeFromCart(item_id){
 		delete cart[item_id]
 		localStorage.setItem("squarebrezhnik.cart",JSON.stringify(cart))
