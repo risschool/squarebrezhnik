@@ -1,65 +1,41 @@
 var products={
     made_of_pine:{
-        price:[4000,6000],
-        hname:"Made of pine",
+        category:"pine",
+        price:['6000+'],
+        hname:"Made of pine (custom)",
         preview:"assets/img/products/product-img-1.jpg",
-        showof_html:`<div class="col-lg-4 col-md-6 text-center">
-        <div class="single-product-item">
-            <div class="product-image">
-                <a href="single-product.html"><img src="assets/img/products/product-img-1.jpg" alt=""></a>
-            </div>
-            <h3>Made of pine</h3>
-            <p class="product-price"><span>Starting from</span> 4000/6000₽ </p>
-            <a href="/cart.html" onclick="addToCart('made_of_pine')" class="cart-btn"><i class="fas fa-shopping-cart"></i> Add to Cart</a>
-        </div>
-    </div>`
+        subtext:"Depends on your desires"
         
     },
     made_of_oak:{
-        price:[6000,9000],
-        hname:"Made of Oak",
+        price:['9000+'],
+        hname:"Made of Oak (custom)",
+        category:"oak",
         preview:"assets/img/products/product-img-3.jpg",
-        showof_html:`<div class="col-lg-4 col-md-6 text-center">
-        <div class="single-product-item">
-            <div class="product-image">
-                <a href="single-product.html"><img src="assets/img/products/product-img-3.jpg" alt=""></a>
-            </div>
-            <h3>Made of oak</h3>
-            <p class="product-price"><span>Starting from</span> 6000/9000₽ </p>
-            <a href="/cart.html" class="cart-btn" onclick="addToCart('made_of_oak')"><i class="fas fa-shopping-cart"></i> Add to Cart</a>
-        </div>
-    </div>`
+        subtext:"Depends on your desires"
     },
     mix_of_woods:{
+        category:"mix",
         price:['25000+'],
-        hname:"Mix of multiple woods",
+        hname:"Mix of multiple woods (custom)",
         preview:"assets/img/products/product-img-2.jpg",
-        showof_html:`<div class="col-lg-4 col-md-6 text-center">
-        <div class="single-product-item">
-            <div class="product-image">
-                <a href="single-product.html"><img src="assets/img/products/product-img-2.jpg" alt=""></a>
-            </div>
-            <h3>Mix of multiple woods</h3>
-            <p class="product-price"><span>Depends on your desires</span> 25000₽+ </p>
-            <a href="/cart.html" onclick="addToCart('mix_of_woods')" class="cart-btn"><i class="fas fa-shopping-cart"></i> Add to Cart</a>
-        </div>
-    </div>`
-    }
+        subtext:"Depends on your desires"
+    },
 
 }
 var workers=[
     {
         name:"Roman Sergeevich",
         role:"Proffesional carpenter",
-        image:"assets/img/avaters/avatar1.png",
+        image:"assets/img/avatars/avatar1.jpg",
         description:'Works with highest qualities of wood in order to create your luxurious bird houses'
 
     },
     {
         name:"Guinn Neil",
         role:"CEO",
-        image:"",
-        description:""
+        image:"assets/img/avatars/avatar2.jpg",
+        description:"Maintains the wellness of the organisation"
     }
 ]
 var asShowOfHTML={}

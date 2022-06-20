@@ -4,24 +4,47 @@
 <script src="/socket.io/socket.io.js"></script>
 <script src="/socket_script.js"></script>
 <script>
+	window.DoNotLoadAnimationsAutomatically=true
+	var cart=JSON.parse(localStorage.getItem("squarebrezhnik.cart"))||{}
 	request({what:"fetchAllProducts"},data=>{
 		console.log(data)
 		var plist=document.getElementById('product-list');
+		var allcategories=[]
+
+		var allhtml=''
 		for(var id in data){
 			var product=data[id]
-			var html=`<div class="col-lg-4 col-md-6 text-center">
+			!allcategories.includes(product.category)&&allcategories.push(product.category)
+			var html=`<div class="col-lg-4 col-md-6 text-center ${product.category}">
         <div class="single-product-item">
             <div class="product-image">
                 <a href="single-product.html"><img src="${product.preview}" alt=""></a>
             </div>
-            <h3>"${product.hname}"</h3>
-            <p class="product-price"><span>Starting from</span> ${product.price.join('/')}₽ </p>
+            <h3>${product.hname}</h3>
+            <p class="product-price"><span>${product.subtext}</span> ${product.price.join('/')}₽ </p>
             <a href="/cart.html" onclick="addToCart('${id}')" class="cart-btn"><i class="fas fa-shopping-cart"></i> Add to Cart</a>
         </div>
     </div>`
-			plist.innerHTML+=html+'\n'
+			allhtml+=html+'\n'
 		}
-		
+		var categhtml=''
+		allcategories.forEach(ctg=>categhtml+=`<li data-filter=".${ctg}">${ctg[0].toUpperCase()}${ctg.substring(1)}</li>\n`)
+		allhtml=`<div class="row">
+                <div class="col-md-12">
+                    <div class="product-filters">
+                        <ul>
+                            <li class="active" id="asterisk-filter" data-filter="*">All</li>
+                            ${categhtml}
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+			<div class="row product-lists" id="product-lists">
+${allhtml}</div>`
+		plist.innerHTML=allhtml
+		animations(jQuery)
+		setTimeout(()=>document.getElementById('asterisk-filter').click(),300)
 	})
 	function addToCart(item_id){
 		cart[item_id]={quantity:1,prefs:{}}
@@ -167,9 +190,9 @@
 
 	<!-- products -->
 	<div class="product-section mt-150 mb-150">
-		<div class="container">
+		<div class="container" id="product-list">
 
-			<div class="row">
+			<!-- <div class="row">
                 <div class="col-md-12">
                     <div class="product-filters">
                         <ul>
@@ -181,7 +204,7 @@
                 </div>
             </div>
 
-			<div class="row product-lists" id="product-list">
+			<div class="row product-lists" id="product-list"> -->
 				<!-- <div class="col-lg-4 col-md-6 text-center strawberry">
 					<div class="single-product-item">
 						<div class="product-image">
@@ -314,7 +337,7 @@
 						<ul>
 							<li><a href="index.html">Home</a></li>
 							<li><a href="about.html">About</a></li>
-							<li><a href="services.html">Shop</a></li>
+							<li><a href="shop.html">Shop</a></li>
 							
 							<li><a href="contact.html">Contact</a></li>
 						</ul>

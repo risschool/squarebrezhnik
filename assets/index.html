@@ -13,14 +13,28 @@
 		return out
 	}
 	var cart=JSON.parse(localStorage.getItem("squarebrezhnik.cart"))||{}
-	request({what:"fetchHomePageProductsHTML"},data=>{
+	request({what:"fetchAllProducts"},data=>{
 		var rpl=document.getElementById("random-product-list")
 		var keys=Object.keys(data)
 		var rprds=[]
 		for(var i=0;i<3;i++)
 		rprds.push(sri(keys,rprds))
-		for(var product in rprds)
-		rpl.innerHTML+=data[rprds[product]]+'\n'
+		var allhtml=''
+		for(var id in rprds)
+		{
+			var product=data[rprds[id]]
+			allhtml+=`<div class="col-lg-4 col-md-6 text-center">
+        <div class="single-product-item">
+            <div class="product-image">
+                <a href="single-product.html"><img src="${product.preview}" alt=""></a>
+            </div>
+            <h3>${product.hname}</h3>
+            <p class="product-price"><span>${product.subtext}</span> ${product.price.join("/")} </p>
+            <a href="/cart.html" onclick="addToCart('${rprds[id]}')" class="cart-btn"><i class="fas fa-shopping-cart"></i> Add to Cart</a>
+        </div>
+    </div>`//+'\n'
+		}
+		rpl.innerHTML+=allhtml
 		
 	})
 	function addToCart(item_id){
@@ -296,14 +310,14 @@
     <!-- end cart banner section -->
 
 	<!-- testimonail-section -->
-	<div class="testimonail-section mt-150 mb-150">
+	<!-- <div class="testimonail-section mt-150 mb-150">
 		<div class="container">
 			<div class="row">
 				<div class="col-lg-10 offset-lg-1 text-center">
 					<div class="testimonial-sliders">
 						<div class="single-testimonial-slider"> 
 							<div class="client-avater">
-								<img src="assets/img/avaters/avatar1.png" alt="">
+								<img src="assets/img/avatars/avatar1.jpg" alt="">
 							</div>
 							<div class="client-meta">
 								<h3>Roman Sergeevich<span>Proffesional carpenter</span></h3>
@@ -317,7 +331,7 @@
 						</div>
 						<div class="single-testimonial-slider">
 							<div class="client-avater">
-								<img src="assets/img/avaters/avatar2.png" alt="">
+								<img src="assets/img/avatars/avatar2.jpg" alt="">
 							</div>
 							<div class="client-meta">
 								<h3>Guinn Neil <span>CEO</span></h3>
@@ -331,7 +345,7 @@
 						</div>
 						<div class="single-testimonial-slider">
 							<div class="client-avater">
-								<img src="assets/img/avaters/avatar3.png" alt="">
+								<img src="assets/img/avatars/avatar3.png" alt="">
 							</div>
 							<div class="client-meta">
 								<h3>Someone else <span> that I haven't added yet</span></h3>
@@ -347,7 +361,7 @@
 				</div>
 			</div>
 		</div>
-	</div>
+	</div> -->
 	<!-- end testimonail-section -->
 	
 	<!-- advertisement section -->
@@ -502,7 +516,7 @@
 						<ul>
 							<li><a href="index.html">Home</a></li>
 							<li><a href="about.html">About</a></li>
-							<li><a href="services.html">Shop</a></li>
+							<li><a href="shop.html">Shop</a></li>
 							
 							<li><a href="contact.html">Contact</a></li>
 						</ul>

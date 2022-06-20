@@ -4,7 +4,8 @@ var express=require("express")
 var sio=require("socket.io")
 var md5=require("md5")
 
-var assets={}
+assets={}
+global.clearCache=()=>assets={}
 var questionsdb=JSON.parse(fs.readFileSync("./jsondatabase/questions.json"))
 function saveQuestion(question){
 questionsdb.questions.push(question)
@@ -38,7 +39,7 @@ function checkAuth(a,sock,inv){
 function requestData(info){
     try{
         switch(info.what){
-            case"fetchHomePageProductsHTML":{
+            case"deprecated":{
                 return allproducts.asShowOfHTML
                 break
             }

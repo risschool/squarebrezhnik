@@ -20,6 +20,7 @@
 								</tr>`
 			ccts.innerHTML+=html+'\n'
 		}
+		calcPrice(data)
 		
 	})
 	function fetchValue(id){
@@ -31,9 +32,45 @@
 		return r
 		
 	}
+	var priceels={}
+	
+	function calcPrice(items){
+		Array.from(document.getElementsByTagName('td')).forEach(v=>v.id?priceels[v.id.substring(6)]=v:1)
+		var lowerbound=0
+		var upperbound=0
+		var shipping=1500
+		var totalUpper=0
+		var totalLower=0
+		for(var item in items){
+			var prd=items[item]
+			var q=cart[item].quantity
+			if(prd.price.length<2){
+				var prc=prd.price[0]
+				prc=(prc-0?prc-0:prc.substring(0,prc.length-1)-0)*q
+				upperbound+=prc
+				lowerbound+=prc
+			}else{
+				var prc1=prd.price[0]
+				var prc2=prd.price[1]
+				prc1=(prc1-0?prc1-0:prc1.substring(0,prc1.length-1)-0)*q
+				prc2=(rc2-0?prc2-0:prc2.substring(0,prc2.length-1)-0)*q
+				lowerbound+=prc1
+				upperbound+=prc2
+			}
+
+		}
+		console.log(lowerbound,upperbound)
+		shipping=(lowerbound>10000&&upperbound>10000)||(lowerbound==0&&upperbound==0)?0:shipping
+		totalLower=lowerbound+shipping
+		totalUpper=upperbound+shipping
+		priceels.subtotal.innerText=`${lowerbound}/${upperbound}₽`
+		priceels.shipping.innerText=shipping+'₽'
+		priceels.total.innerText=`${totalLower}/${totalUpper}₽`
+	}
 	function setQuantity(item, quantity){
 		cart[item].quantity=quantity
 		localStorage.setItem("squarebrezhnik.cart",JSON.stringify(cart))
+		window.location.reload()
 	}
 	function removeFromCart(item_id){
 		delete cart[item_id]
@@ -213,15 +250,15 @@
 							<tbody>
 								<tr class="total-data">
 									<td><strong>Subtotal: </strong></td>
-									<td>$500</td>
+									<td id="price-subtotal">$500</td>
 								</tr>
 								<tr class="total-data">
 									<td><strong>Shipping: </strong></td>
-									<td>$45</td>
+									<td id="price-shipping">$45</td>
 								</tr>
 								<tr class="total-data">
 									<td><strong>Total: </strong></td>
-									<td>$545</td>
+									<td id="price-total">$545</td>
 								</tr>
 							</tbody>
 						</table>
@@ -299,7 +336,7 @@
 						<ul>
 							<li><a href="index.html">Home</a></li>
 							<li><a href="about.html">About</a></li>
-							<li><a href="services.html">Shop</a></li>
+							<li><a href="shop.html">Shop</a></li>
 							
 							<li><a href="contact.html">Contact</a></li>
 						</ul>
