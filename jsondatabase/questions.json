@@ -1,0 +1,30 @@
+{
+    "questions": [
+        {
+            "identification": {
+                "name": "Nikifor",
+                "email": "cheshinskiy.n@rischool.community"
+            },
+            "questionHeader": {
+                "phone": "+79999886420",
+                "subject": "Purchase"
+            },
+            "messageC": {
+                "message": "birdbox pls"
+            }
+        },
+        {
+            "identification": {
+                "name": "someOtherCustomer",
+                "email": "customer@gmail.com"
+            },
+            "questionHeader": {
+                "phone": "+82832190893219",
+                "subject": "Purchase"
+            },
+            "messageC": {
+                "message": "Can I buy a bird box pls"
+            }
+        }
+    ]
+}

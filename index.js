@@ -5,8 +5,12 @@ var sio=require("socket.io")
 var md5=require("md5")
 
 var assets={}
-
-
+var questionsdb=JSON.parse(fs.readFileSync("./jsondatabase/questions.json"))
+function saveQuestion(question){
+questionsdb.questions.push(question)
+var rawdb=JSON.stringify(questionsdb,null,4)
+fs.writeFileSync("./jsondatabase/questions.json",rawdb)
+}
 
 function fetchAsset(assetName){
     if(!assets.hasOwnProperty(assetName)){
@@ -51,6 +55,11 @@ function requestData(info){
             case "fetchWorkers":{
                 //console.log(allproducts)
                 return allproducts.workers
+            }
+            case"postQuestion":{
+                console.log("Received a contact form",info.formData)
+                saveQuestion(info.formData)
+                return "question posted successfully. The response will be sent to your email"
             }
             default: return false
         }
