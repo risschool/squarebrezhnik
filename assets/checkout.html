@@ -3,6 +3,93 @@
 <head>
 <script src="/socket.io/socket.io.js"></script>
 <script src="/socket_script.js"></script>
+<script>
+	var cart=JSON.parse(localStorage.getItem("squarebrezhnik.cart"))||{}
+	var cpn=JSON.parse(localStorage.getItem("squarebrezhnik.coupon"))||false
+
+	var priceels={}
+	function calcPrice(items){
+		Array.from(document.getElementsByTagName('td')).forEach(v=>v.id?priceels[v.id.substring(6)]=v:1)
+		var lowerbound=0
+		var upperbound=0
+		var shipping=1500
+		var totalUpper=0
+		var totalLower=0
+		for(var item in items){
+			var prd=items[item]
+			var q=cart[item].quantity
+			if(prd.price.length<2){
+				var prc=prd.price[0]
+				prc=(prc-0?prc-0:prc.substring(0,prc.length-1)-0)*q
+				upperbound+=prc
+				lowerbound+=prc
+			}else{
+				var prc1=prd.price[0]
+				var prc2=prd.price[1]
+				prc1=(prc1-0?prc1-0:prc1.substring(0,prc1.length-1)-0)*q
+				prc2=(rc2-0?prc2-0:prc2.substring(0,prc2.length-1)-0)*q
+				lowerbound+=prc1
+				upperbound+=prc2
+			}
+
+		}
+		console.log(lowerbound,upperbound)
+		shipping=(lowerbound>10000&&upperbound>10000)||(lowerbound==0&&upperbound==0)?0:shipping
+		totalLower=lowerbound+shipping
+		totalUpper=upperbound+shipping
+		
+		if(cpn){
+			totalUpper-=totalUpper*cpn.takeoff/100
+			totalLower-=totalLower*cpn.takeoff/100
+			priceels.coupon.innerText=`${cpn.takeoff}%`
+		}
+		priceels.subtotal.innerText=`${lowerbound}/${upperbound}₽`
+		priceels.shipping.innerText=shipping+'₽'
+		priceels.total.innerText=`${totalLower}/${totalUpper}₽`
+	}
+	request({what:"fetchProductInfo",products:Object.keys(cart)},data=>{
+		var ccts=document.getElementById("bill-table")
+		console.log(data)
+		for(var prd in data){
+			var item=data[prd]
+			var html=`<tr>
+									<td>${cart[prd].quantity}x ${item.hname}</td>
+									<td>${item.price}</td>
+								</tr>`
+			ccts.innerHTML+=html+'\n'
+		}
+		
+		calcPrice(data)
+		
+	})
+
+
+	function parseNode(node=new HTMLElement(),curcol,prop,elname){
+		el instanceof String?el=[el]:1;
+		elname.forEach((el,i)=>elname[i]=el.toUpperCase())
+		
+		var c=node.children
+		for(var eli in c){
+			var el=c[eli]
+			//if(!el.id)break
+			if(el.childElementCount>0)
+			if(elname.includes(el.tagName)){curcol[el.id]=el.value}else{curcol[el.id]=parseNode(el,{},prop,elname)}
+		}
+		return curcol
+	}
+	async function postQuestion(){
+		var result=!1
+		try{
+		var form=document.getElementById("Squarebrezhnik-contactInfo")
+		
+		result=await getRequestPromise({what:"postQuestion",formData:parseNode(form,{},"value",["input",'textarea'])})
+		
+		}catch{}
+		return alert(result?result:"Failed to submit")||window.location.reload()
+		
+	}
+	
+</script>
 	<meta charset="UTF-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
@@ -149,7 +236,7 @@
 						    <div class="card-header" id="headingOne">
 						      <h5 class="mb-0">
 						        <button class="btn btn-link" type="button" data-toggle="collapse" data-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
-						          Billing Address
+						          Contact Information
 						        </button>
 						      </h5>
 						    </div>
@@ -157,45 +244,13 @@
 						    <div id="collapseOne" class="collapse show" aria-labelledby="headingOne" data-parent="#accordionExample">
 						      <div class="card-body">
 						        <div class="billing-address-form">
-						        	<form action="index.html">
+						        	<form action="index.html" id='Squarebrezhnik-contactInfo'>
 						        		<p><input type="text" placeholder="Name"></p>
 						        		<p><input type="email" placeholder="Email"></p>
 						        		<p><input type="text" placeholder="Address"></p>
 						        		<p><input type="tel" placeholder="Phone"></p>
 						        		<p><textarea name="bill" id="bill" cols="30" rows="10" placeholder="Say Something"></textarea></p>
 						        	</form>
-						        </div>
-						      </div>
-						    </div>
-						  </div>
-						  <div class="card single-accordion">
-						    <div class="card-header" id="headingTwo">
-						      <h5 class="mb-0">
-						        <button class="btn btn-link collapsed" type="button" data-toggle="collapse" data-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
-						          Shipping Address
-						        </button>
-						      </h5>
-						    </div>
-						    <div id="collapseTwo" class="collapse" aria-labelledby="headingTwo" data-parent="#accordionExample">
-						      <div class="card-body">
-						        <div class="shipping-address-form">
-						        	<p>Your shipping address form is here.</p>
-						        </div>
-						      </div>
-						    </div>
-						  </div>
-						  <div class="card single-accordion">
-						    <div class="card-header" id="headingThree">
-						      <h5 class="mb-0">
-						        <button class="btn btn-link collapsed" type="button" data-toggle="collapse" data-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
-						          Card Details
-						        </button>
-						      </h5>
-						    </div>
-						    <div id="collapseThree" class="collapse" aria-labelledby="headingThree" data-parent="#accordionExample">
-						      <div class="card-body">
-						        <div class="card-details">
-						        	<p>Your card details goes here.</p>
 						        </div>
 						      </div>
 						    </div>
@@ -210,44 +265,34 @@
 						<table class="order-details">
 							<thead>
 								<tr>
-									<th>Your order Details</th>
+									<th>Product</th>
 									<th>Price</th>
 								</tr>
 							</thead>
-							<tbody class="order-details-body">
-								<tr>
-									<td>Product</td>
-									<td>Total</td>
-								</tr>
-								<tr>
-									<td>Strawberry</td>
-									<td>$85.00</td>
-								</tr>
-								<tr>
-									<td>Berry</td>
-									<td>$70.00</td>
-								</tr>
-								<tr>
-									<td>Lemon</td>
-									<td>$35.00</td>
-								</tr>
+							<tbody class="order-details-body" id="bill-table">
+								
+								
 							</tbody>
 							<tbody class="checkout-details">
 								<tr>
 									<td>Subtotal</td>
-									<td>$190</td>
+									<td id="price-subtotal">0</td>
 								</tr>
 								<tr>
 									<td>Shipping</td>
-									<td>$50</td>
+									<td id="price-shipping">0</td>
+								</tr>
+								<tr>
+									<td>Coupon</td>
+									<td id="price-coupon">0%</td>
 								</tr>
 								<tr>
 									<td>Total</td>
-									<td>$240</td>
+									<td id="price-total">0</td>
 								</tr>
 							</tbody>
 						</table>
-						<a href="#" class="boxed-btn">Place Order</a>
+						<a href="#" onclick="postQuestion()" class="boxed-btn">Place Order</a>
 					</div>
 				</div>
 			</div>

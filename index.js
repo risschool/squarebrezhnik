@@ -3,8 +3,17 @@ var fs=require("fs")
 var express=require("express")
 var sio=require("socket.io")
 var md5=require("md5")
-
+var nm=require("nodemailer")
+var emtrans=global.emailTransport=nm.createTransport({
+    service:"hotmail",
+    "auth":{
+        "user":"squarebrezhnik@outlook.com",
+        "pass":fs.readFileSync("emailpsw.txt").toString()
+    }
+})
 assets={}
+var emailtemplates={}
+fs.readdirSync("email_templates").forEach(f=>emailtemplates[f] = fs.readFileSync('email_templates/'+f,'utf8'))
 global.clearCache=()=>assets={}
 var questionsdb=JSON.parse(fs.readFileSync("./jsondatabase/questions.json"))
 function saveQuestion(question){
@@ -27,7 +36,17 @@ function fetchAsset(assetName){
     }
     return assets[assetName]
 }
-var allproducts=require("./products.js")
+function template(template,replace,...replacers){
+    var splitted=template.split(replace)
+    var result=''
+    for (let i = 0; i < splitted.length; i++) {
+        result+=splitted[i]+replacers[i]
+    }
+    //var i=0
+    //splitted.forEach(v=>result+=v+replacers[i]?replacers[i++]:'')
+    return result
+}
+var allproducts=require("./db.js")
 var socktokens=new Map()
 var socketInvalidationInterval=setInterval(()=>{
     var dn=Date.now()
@@ -36,11 +55,11 @@ var socketInvalidationInterval=setInterval(()=>{
 function checkAuth(a,sock,inv){
     socktokens.has(a)?clearTimeout(inv)||sockethandler(new socketUser(sock,a)):sock.disconnect(true)
 }
-function requestData(info){
+async function requestData(info){
     try{
         switch(info.what){
-            case"deprecated":{
-                return allproducts.asShowOfHTML
+            case"verifyCoupon":{
+                return allproducts.verifyCoupon(info.coupon)
                 break
             }
             case"fetchAllProducts":{
@@ -58,7 +77,16 @@ function requestData(info){
                 return allproducts.workers
             }
             case"postQuestion":{
+                //cheshinskiy.n@rischool.community
                 console.log("Received a contact form",info.formData)
+                var formData=info.formData
+                //var text=template(emailtemplates['question.html'],'${prop}',formData.identification.name,formData.messageC.message,formData.identification.email)
+                emtrans.sendMail({
+                    from:"squarebrezhnik@outlook.com",
+                    to:info.formData.identification.email,
+                    subject:"Received your support request",
+                    text:`${formData.identification.name},We have received your support request. Your question is "${formData.messageC.message}". The response message will be sent to ${formData.identification.email}`
+                },console.log)
                 saveQuestion(info.formData)
                 return "question posted successfully. The response will be sent to your email"
             }

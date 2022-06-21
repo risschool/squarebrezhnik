@@ -5,6 +5,7 @@
 <script src="/socket_script.js"></script>
 <script type="text/javascript" >
 	var cart=JSON.parse(localStorage.getItem("squarebrezhnik.cart"))||{}
+	var cpn=JSON.parse(localStorage.getItem("squarebrezhnik.coupon"))||false
 	request({what:"fetchProductInfo",products:Object.keys(cart)},data=>{
 		var ccts=document.getElementById('cart-contents')
 		console.log(data)
@@ -20,6 +21,7 @@
 								</tr>`
 			ccts.innerHTML+=html+'\n'
 		}
+		cpn?document.getElementById('coupon-input').value=cpn.name:1
 		calcPrice(data)
 		
 	})
@@ -34,6 +36,24 @@
 	}
 	var priceels={}
 	
+	async function applyCoupon(){
+		try{
+			var couponel=document.getElementById('coupon-input')
+		var response=await getRequestPromise({what:"verifyCoupon",coupon:couponel.value})
+		if(response){
+			cpn=response
+			localStorage.setItem("squarebrezhnik.coupon",JSON.stringify(cpn))
+			alert(`You successfully applied coupon "${response.name}" that takes off ${response.takeoff}%. ${response.message}`)
+		
+		}
+		else{localStorage.setItem("squarebrezhnik.coupon",false); alert("This coupon does not exist!")}
+		
+		
+	}catch(e){
+		console.log(e)
+	}
+	return false
+	}
 	function calcPrice(items){
 		Array.from(document.getElementsByTagName('td')).forEach(v=>v.id?priceels[v.id.substring(6)]=v:1)
 		var lowerbound=0
@@ -63,6 +83,12 @@
 		shipping=(lowerbound>10000&&upperbound>10000)||(lowerbound==0&&upperbound==0)?0:shipping
 		totalLower=lowerbound+shipping
 		totalUpper=upperbound+shipping
+		
+		if(cpn){
+			totalUpper-=totalUpper*cpn.takeoff/100
+			totalLower-=totalLower*cpn.takeoff/100
+			priceels.coupon.innerText=`${cpn.takeoff}%`
+		}
 		priceels.subtotal.innerText=`${lowerbound}/${upperbound}₽`
 		priceels.shipping.innerText=shipping+'₽'
 		priceels.total.innerText=`${totalLower}/${totalUpper}₽`
@@ -250,15 +276,19 @@
 							<tbody>
 								<tr class="total-data">
 									<td><strong>Subtotal: </strong></td>
-									<td id="price-subtotal">$500</td>
+									<td id="price-subtotal">0</td>
 								</tr>
 								<tr class="total-data">
 									<td><strong>Shipping: </strong></td>
-									<td id="price-shipping">$45</td>
+									<td id="price-shipping">0</td>
+								</tr>
+								<tr class="total-data">
+									<td><strong>Coupon: </strong></td>
+									<td id="price-coupon">0%</td>
 								</tr>
 								<tr class="total-data">
 									<td><strong>Total: </strong></td>
-									<td id="price-total">$545</td>
+									<td id="price-total">0</td>
 								</tr>
 							</tbody>
 						</table>
@@ -271,9 +301,9 @@
 					<div class="coupon-section">
 						<h3>Apply Coupon</h3>
 						<div class="coupon-form-wrap">
-							<form action="index.html">
-								<p><input type="text" placeholder="Coupon"></p>
-								<p><input type="submit" value="Apply"></p>
+							<form action="/cart.html">
+								<p><input type="text" id="coupon-input" placeholder="Coupon"></p>
+								<p><input type="submit" onclick="applyCoupon()" value="Apply"></p>
 							</form>
 						</div>
 					</div>

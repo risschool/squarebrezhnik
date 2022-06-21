@@ -1,0 +1,15 @@
+[
+    {
+        "name":"Roman Sergeevich",
+        "role":"Proffesional carpenter",
+        "image":"assets/img/avatars/avatar1.jpg",
+        "description":"Works with highest qualities of wood in order to create your luxurious bird houses"
+
+    },
+    {
+        "name":"Guinn Neil",
+        "role":"CEO",
+        "image":"assets/img/avatars/avatar2.jpg",
+        "description":"Maintains the wellness of the organisation"
+    }
+]
