@@ -55,7 +55,7 @@ var socketInvalidationInterval=setInterval(()=>{
 function checkAuth(a,sock,inv){
     socktokens.has(a)?clearTimeout(inv)||sockethandler(new socketUser(sock,a)):sock.disconnect(true)
 }
-async function requestData(info){
+function requestData(info){
     try{
         switch(info.what){
             case"verifyCoupon":{
@@ -64,6 +64,7 @@ async function requestData(info){
             }
             case"fetchAllProducts":{
                 return allproducts.products
+                break
             }
             case"fetchProductInfo":{
                 if(!info.hasOwnProperty('products'))return false
@@ -71,6 +72,7 @@ async function requestData(info){
                 for(var prd in info.products)
                 returnv[info.products[prd]] = allproducts.basic_info[info.products[prd]]
                 return returnv
+                break
             }
             case "fetchWorkers":{
                 //console.log(allproducts)
@@ -81,12 +83,12 @@ async function requestData(info){
                 console.log("Received a contact form",info.formData)
                 var formData=info.formData
                 //var text=template(emailtemplates['question.html'],'${prop}',formData.identification.name,formData.messageC.message,formData.identification.email)
-                emtrans.sendMail({
-                    from:"squarebrezhnik@outlook.com",
-                    to:info.formData.identification.email,
-                    subject:"Received your support request",
-                    text:`${formData.identification.name},We have received your support request. Your question is "${formData.messageC.message}". The response message will be sent to ${formData.identification.email}`
-                },console.log)
+                // emtrans.sendMail({
+                //     from:"squarebrezhnik@outlook.com",
+                //     to:info.formData.identification.email,
+                //     subject:"Received your support request",
+                //     text:`${formData.identification.name},We have received your support request. Your question is "${formData.messageC.message}". The response message will be sent to ${formData.identification.email}`
+                // },console.log)
                 saveQuestion(info.formData)
                 return "question posted successfully. The response will be sent to your email"
             }

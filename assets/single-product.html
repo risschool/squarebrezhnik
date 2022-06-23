@@ -3,6 +3,89 @@
 <head>
 <script src="/socket.io/socket.io.js"></script>
 <script src="/socket_script.js"></script>
+<script>
+	function sri(arr,donotguess=[]){
+		var out
+		do
+		out=arr[Math.floor(Math.random()*arr.length)]
+		while(donotguess.includes(out))
+		
+		return out
+	}
+	var cart=JSON.parse(localStorage.getItem("squarebrezhnik.cart"))||{}
+	if(window.location.search=="")window.location.href="/"
+	var curid=window.location.search.substring(4)
+	request({what:"fetchAllProducts"},data=>{
+		if(!data.hasOwnProperty(curid))window.location.href='/'
+	var rpl=document.getElementById("random-product-list")
+	var keys=Object.keys(data)
+		var rprds=[]
+		
+
+		for(var i=0;i<3;i++)
+		rprds.push(sri(keys,rprds))
+		var allhtml=''
+		var priceels={}
+		Array.from(document.getElementsByClassName('product-data')).forEach(v=>v.id?priceels[v.id.substring(8)]=v:1)
+		priceels.atc.setAttribute('onclick',`addToCart('${curid}')`)
+		priceels.price.innerText=data[curid].price.join('/')
+		priceels.image.src=data[curid].preview
+		priceels.title.innerText=data[curid].hname
+		//data
+		//console.log(priceels)
+		//parseCustom()
+		for(var id in rprds)
+		{
+			
+			var product=data[rprds[id]]
+			allhtml+=`<div class="col-lg-4 col-md-6 text-center">
+					<div class="single-product-item">
+						<div class="product-image">
+							<a href="single-product.html?id=${rprds[id]}"><img src="${product.preview}" alt=""></a>
+						</div>
+						<h3>${product.hname}</h3>
+						<p class="product-price"><span>${product.subtext}</span> ${product.price.join('/')}</p> </p>
+						<a href="cart.html" class="cart-btn" onclick="defaultAddToCart('${rprds[id]}')">Add<i class="fas fa-shopping-cart"></i> Add to Cart</a>
+					</div>
+				</div>`//+'\n'
+		}
+		document.getElementById('random-product-list').innerHTML=allhtml
+	})
+	async function parseCustom(){
+		var ctbl=document.getElementById("custom_table")
+		var kv={}
+		Array.from(ctbl.children).forEach(v=>kv[v.children[0].innerText]=v.children[1].children[0])
+		try{
+		var inp=kv['Example photo or blueprint']
+		var str='';
+		(new Uint8Array(await inp.files[0].arrayBuffer())).forEach(v=>str+=String.fromCharCode(v))
+		var bs = btoa(str);
+		kv['Example photo or blueprint']={bs,name:inp.files[0].name}
+		}catch(err){kv['Example photo or blueprint']={bs:null,name:null}}
+		kv.Amount=kv.Amount.value-0||1
+		kv.Color=kv.Color.value||'#000000'
+		kv.Comments=kv.Comments.value||"no comments"
+		return kv
+	}
+	function parseFile(){
+		var ctbl=document.getElementById("custom_table")
+		var kv={}
+		Array.from(ctbl.children).forEach(v=>kv[v.children[0].innerText]=v.children[1].children[0])
+		var inp=kv['Example photo or blueprint']
+		var matches=false
+		if(!inp.value)return
+		['jpg','png','bmp'].forEach(v=>inp.value.endsWith(v)?matches=!0:1)
+		if(!matches)return alert("File must have an extension .jpg .png or .bmp")||window.location.reload()
+		if(inp.files[0].size>1024*150)return alert("Maximum file size is 150 kb")||window.location.reload()
+	}
+	async function addToCart(item_id){
+		var data=await parseCustom()
+		cart[item_id]={quantity:data.Amount,prefs:{bp:data["Example photo or blueprint"],comment:data.Comments,color:data.Color}}
+		localStorage.setItem("squarebrezhnik.cart",JSON.stringify(cart))
+		window.location.href="/cart.html"
+		return 1
+}
+</script>
 	<meta charset="UTF-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
@@ -144,28 +227,51 @@
 			<div class="row">
 				<div class="col-md-5">
 					<div class="single-product-img">
-						<img src="assets/img/products/product-img-5.jpg" alt="">
+						<img src="" class="product-data" id="product-image" alt="">
 					</div>
 				</div>
 				<div class="col-md-7">
 					<div class="single-product-content">
-						<h3>Green apples have polyphenols</h3>
-						<p class="single-product-pricing"><span>Per Kg</span> $50</p>
-						<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Dicta sint dignissimos, rem commodi cum voluptatem quae reprehenderit repudiandae ea tempora incidunt ipsa, quisquam animi perferendis eos eum modi! Tempora, earum.</p>
+						<h3 id="product-title" class="product-data">Product Title</h3>
+						<p class="single-product-pricing product-data" id="product-price">Product price</p>
+						<p class="product-data" id="product-description">Product Description</p>
 						<div class="single-product-form">
 							<form action="index.html">
-								<input type="number" placeholder="0">
+								<table class="order-details">
+									<thead>
+										<tr>
+											<th>Option</th>
+											<th>Value</th>
+										</tr>
+									</thead>
+									<tbody id="custom_table">
+										<tr>
+											<td>Amount</td>
+											<td><input type="number" placeholder="0"></td>
+										</tr>
+										<tr>
+											<td>Color</td>
+											<td><input type="color"></td>
+										</tr>
+										<tr>
+											<td>Example photo or blueprint</td>
+											<td><input onchange="parseFile()" type="file"></td>
+										</tr>
+										<tr>
+											<td>Comments</td>
+											<td><textarea style="resize:both;border-radius: 7px;"></textarea></td>
+										</tr>
+									</tbody>
+								</table>
+								
+								
+								
+								
 							</form>
-							<a href="cart.html" class="cart-btn"><i class="fas fa-shopping-cart"></i> Add to Cart</a>
-							<p><strong>Categories: </strong>Fruits, Organic</p>
+							<a href="cart.html" class="cart-btn product-data" id="product-atc"><i class="fas fa-shopping-cart"></i> Add to Cart</a>
+							
 						</div>
-						<h4>Share:</h4>
-						<ul class="product-share">
-							<li><a href=""><i class="fab fa-facebook-f"></i></a></li>
-							<li><a href=""><i class="fab fa-twitter"></i></a></li>
-							<li><a href=""><i class="fab fa-google-plus-g"></i></a></li>
-							<li><a href=""><i class="fab fa-linkedin"></i></a></li>
-						</ul>
+						
 					</div>
 				</div>
 			</div>
@@ -180,12 +286,13 @@
 				<div class="col-lg-8 offset-lg-2 text-center">
 					<div class="section-title">	
 						<h3><span class="orange-text">Related</span> Products</h3>
-						<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Aliquid, fuga quas itaque eveniet beatae optio.</p>
+						<p>Here you can see a list of random products that are available in the <a href="/shop.html"><u>shop</u></a> section of the website.</p>
+						<!-- <p>Here is a random list of products available </p> -->
 					</div>
 				</div>
 			</div>
-			<div class="row">
-				<div class="col-lg-4 col-md-6 text-center">
+			<div class="row" id="random-product-list">
+				<!-- <div class="col-lg-4 col-md-6 text-center">
 					<div class="single-product-item">
 						<div class="product-image">
 							<a href="single-product.html"><img src="assets/img/products/product-img-1.jpg" alt=""></a>
@@ -195,16 +302,7 @@
 						<a href="cart.html" class="cart-btn"><i class="fas fa-shopping-cart"></i> Add to Cart</a>
 					</div>
 				</div>
-				<div class="col-lg-4 col-md-6 text-center">
-					<div class="single-product-item">
-						<div class="product-image">
-							<a href="single-product.html"><img src="assets/img/products/product-img-2.jpg" alt=""></a>
-						</div>
-						<h3>Berry</h3>
-						<p class="product-price"><span>Per Kg</span> 70$ </p>
-						<a href="cart.html" class="cart-btn"><i class="fas fa-shopping-cart"></i> Add to Cart</a>
-					</div>
-				</div>
+				<
 				<div class="col-lg-4 col-md-6 offset-lg-0 offset-md-3 text-center">
 					<div class="single-product-item">
 						<div class="product-image">
@@ -214,7 +312,7 @@
 						<p class="product-price"><span>Per Kg</span> 35$ </p>
 						<a href="cart.html" class="cart-btn"><i class="fas fa-shopping-cart"></i> Add to Cart</a>
 					</div>
-				</div>
+				</div> -->
 			</div>
 		</div>
 	</div>

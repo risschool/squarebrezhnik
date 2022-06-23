@@ -18,7 +18,7 @@
 			var html=`<div class="col-lg-4 col-md-6 text-center ${product.category}">
         <div class="single-product-item">
             <div class="product-image">
-                <a href="single-product.html"><img src="${product.preview}" alt=""></a>
+                <a href="single-product.html?id=${id}"><img src="${product.preview}" alt=""></a>
             </div>
             <h3>${product.hname}</h3>
             <p class="product-price"><span>${product.subtext}</span> ${product.price.join('/')}₽ </p>

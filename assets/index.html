@@ -14,23 +14,24 @@
 	}
 	var cart=JSON.parse(localStorage.getItem("squarebrezhnik.cart"))||{}
 	request({what:"fetchAllProducts"},data=>{
-		var rpl=document.getElementById("random-product-list")
-		var keys=Object.keys(data)
+	var rpl=document.getElementById("random-product-list")
+	var keys=Object.keys(data)
 		var rprds=[]
 		for(var i=0;i<3;i++)
 		rprds.push(sri(keys,rprds))
 		var allhtml=''
 		for(var id in rprds)
 		{
-			var product=data[rprds[id]]
+			var name=rprds[id]
+			var product=data[name]
 			allhtml+=`<div class="col-lg-4 col-md-6 text-center">
         <div class="single-product-item">
             <div class="product-image">
-                <a href="single-product.html"><img src="${product.preview}" alt=""></a>
+                <a href="single-product.html?id=${name}"><img src="${product.preview}" alt=""></a>
             </div>
             <h3>${product.hname}</h3>
             <p class="product-price"><span>${product.subtext}</span> ${product.price.join("/")} </p>
-            <a href="/cart.html" onclick="addToCart('${rprds[id]}')" class="cart-btn"><i class="fas fa-shopping-cart"></i> Add to Cart</a>
+            <a href="/cart.html" onclick="addToCart('${name}')" class="cart-btn"><i class="fas fa-shopping-cart"></i> Add to Cart</a>
         </div>
     </div>`//+'\n'
 		}
@@ -236,7 +237,7 @@
 				<div class="col-lg-8 offset-lg-2 text-center">
 					<div class="section-title">	
 						<h3><span class="orange-text">Our</span> Bird houses</h3>
-						<p>Here you can see a list of random products that are available in the <a href="/shop.html"><u>shop</u></a> section of the website. Prices are shown as default/customisable (with your custom preferences)</p>
+						<p>Here you can see a list of random products that are available in the <a href="/shop.html"><u>shop</u></a> section of the website</p>
 					</div>
 				</div>
 			</div>

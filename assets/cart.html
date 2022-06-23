@@ -17,7 +17,7 @@
 									<td class="product-name">${item.hname}</td>
 									<td class="product-price">${item.price.join('/')}</td>
 									<td class="product-quantity"><input id="${prd}::quantityInput" onchange="setQuantity('${prd}',fetchValue('${prd}::quantityInput'))" value="${cart[prd].quantity}" type="number" placeholder="0"></td>
-									
+									<td><a href="single-product.html?id=${prd}">Customise</a></td>
 								</tr>`
 			ccts.innerHTML+=html+'\n'
 		}
@@ -254,6 +254,7 @@
 									<th class="product-name">Name</th>
 									<th class="product-price">Price</th>
 									<th class="product-quantity">Quantity</th>
+									<th class="product-quantity">Customise</th>
 									<!-- <th class="product-total">Total</th> -->
 								</tr>
 							</thead>

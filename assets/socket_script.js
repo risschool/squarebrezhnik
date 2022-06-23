@@ -14,4 +14,6 @@ var socket = io();
     function getRequestPromise(what){
         return new Promise((res,rej)=>socket.emit("requestData",what,generateRQID(res)))
     }
-    socket.on("responseData",(d,id)=>requests.get(id)(d))
+    socket.on("responseData",(d,id)=>{
+        requests.get(id)(d)
+    })
